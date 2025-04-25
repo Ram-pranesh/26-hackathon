@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <title>Document</title>
 </head>
 <body>
@@ -58,6 +59,9 @@
   <div>
     <button onclick="displayHistory()">History</button>
   </div>
+    <canvas id="pieChart" width="400" height="400"></canvas>
+    <canvas id="barChart" width="400" height="400"></canvas>
+    <script src="chart.js"></script>
 </body>
 <script>
     const dateId=document.getElementById("date");
