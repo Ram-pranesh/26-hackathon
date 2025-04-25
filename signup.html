@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SignUp</title>
+</head>
+<body>
+  <div>
+    <label for="name">Name</label>
+    <input type="text" id="name" placeholder="Enter your name" required><br>
+
+    <label for="email">E-mail</label>
+    <input type="email" id="email" placeholder="Enter your email" required><br>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="password" required><br>
+
+    <button type="button" id="submit">Submit</button>
+    
+</div>
+  
+</body>
+<script>
+  document.getElementById("submit").addEventListener("click",async ()=>{
+
+    const name=document.getElementById("name").value;
+    const email=document.getElementById("email").value;
+    const password=document.getElementById("password").value;
+
+    const data={
+      name,email,password,
+      transaction:{
+        income:0,
+        expense:0,
+        balance:0
+      }
+    }
+
+    const response = await fetch("/signup",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+      },
+      body: JSON.stringify(data),
+    })
+
+    const result= await response.json();
+
+    const arr=JSON.parse(localStorage.getItem("arr")) || [];
+    arr.push(result)
+    localStorage.setItem("arr",JSON.stringify(arr));
+    console.log(arr);
+
+  })
+</script>
+</html>

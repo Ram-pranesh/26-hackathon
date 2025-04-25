@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+</head>
+<body>
+  <button onclick="displayAcc()">Show accounts</button>
+</body>
+<script>
+  async function displayAcc() {
+    const arrId = JSON.parse(localStorage.getItem("arr"));
+    console.log(arrId);
+    const response = await fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(arrId)
+    });
+    const result = await response.json();
+
+    for (let i = 0; i < result.length; i++) {
+      const email = result[i].email;
+      const password = result[i].password;
+
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <p>
+          <button onclick="passCheck('${email}', '${password}')">${email}</button>
+        </p>
+        <p id="${email}"></p>
+      `;
+      document.body.append(div);
+    }
+  }
+
+  function passCheck(email, password) {
+    const container = document.getElementById(email);
+    container.innerHTML = `
+      <input type="password" id="input-${email}" placeholder="Enter your password">
+      <button onclick="validation('${email}', '${password}')">Login</button>
+    `;
+  }
+
+  async function validation(email, password) {
+    const inputPassword = document.getElementById(`input-${email}`).value;
+    if (inputPassword === password) {
+      let today=new Date();
+      let ddmmyyyy=today.toLocaleDateString("en-GB");
+      let currentDate=ddmmyyyy.replaceAll("/","-");
+      alert("Login successful");
+
+      localStorage.setItem("email",JSON.stringify(email));
+
+      const data={
+        email,currentDate
+      }
+      const response=await fetch("/setCurrentDate.html",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(data)
+      })
+      
+      window.location.href = "/home.html";
+      
+    } else {
+      alert("Login failed");
+    }
+  }
+</script>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>
+    <p>Date</p>
+    <p id="date"></p>
+  </div>
+  <div>
+    <p>Income : </p>
+    <p id="income"></p>
+  </div>
+  <div>
+    <p>Expense : </p>
+    <p id="expense"></p>
+  </div>
+  <div>
+    <p>Balance : </p>
+    <p id="balance"></p> 
+  </div>
+  <div>
+    <h2>Add transaction</h2>
+    <label for="description">Description : </label>
+    <input type="text" id="description" placeholder="Enter description"><br>
+
+    <label for="amount">Amount : </label>
+    <input type="number" id="amount" placeholder="Enter amount"><br>
+
+    <label for="AmountType">Type : </label>
+    <select id="AmountType">
+      <option value="income">Income</option>
+      <option value="expense">Expense</option>
+    </select><br>
+
+    <button type="button" onclick="addAmount()">Add transaction</button>
+  </div>
+
+  <div>
+    <h2>Transaction History</h2>
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody">
+        <!-- Transaction history will be populated here -->
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <button onclick="displayHistory()">History</button>
+  </div>
+</body>
+<script>
+    const dateId=document.getElementById("date");
+    const incomeId=document.getElementById("income");
+    const expenseId=document.getElementById("expense");
+    const balanceId=document.getElementById("balance");
+    const typeId=document.getElementById("AmountType");
+    const descriptionId=document.getElementById("description");
+
+    let date;
+    let income;
+    let expense;
+    let balance;
+    let logMail;
+  async function fetchTransactions(){
+
+    logMail=JSON.parse(localStorage.getItem("email"));
+    const response=await fetch("/transaction",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(logMail)
+    })
+    const result= await response.json();
+    console.log(result);
+    3
+    date=result.currentDate;
+    income=result.transaction.income;
+    expense=result.transaction.expense;
+    balance=result.transaction.balance;
+
+    dateId.innerHTML=date;
+    incomeId.innerHTML=income;
+    expenseId.innerHTML=expense;
+    balanceId.innerHTML=balance;
+
+  }
+  fetchTransactions();
+
+  async function addAmount(){
+    const amt=document.getElementById("amount").value;
+    const des=descriptionId.value;
+    const type=typeId.value;
+    if(type==="income"){
+      income+=Number(amt);
+    }
+    else if(type==="expense"){
+      expense+=Number(amt);
+    }
+    balance=income-expense;
+    incomeId.innerHTML=income;
+    expenseId.innerHTML=expense;
+    balanceId.innerHTML=balance;
+
+    const historyBody=document.getElementById("historyBody");
+    const newRow=document.createElement("tr");
+    const dateCell=document.createElement("td");
+    const typeCell=document.createElement("td");
+    const amountCell=document.createElement("td");
+    const descriptionCell=document.createElement("td");
+
+    dateCell.innerHTML=date;
+    typeCell.innerHTML=type;
+    amountCell.innerHTML=amt;
+    descriptionCell.innerHTML=des;
+
+    newRow.appendChild(dateCell);
+    newRow.appendChild(typeCell);
+    newRow.appendChild(amountCell); 
+    newRow.appendChild(descriptionCell);
+    historyBody.appendChild(newRow);
+    
+    const historyTable=document.getElementById("historyTable");
+    historyTable.style.display="block";
+
+    const now = new Date();
+    const dateTime = now.toLocaleString(); // e.g. "4/24/2025, 8:05:23 PM"
+    
+
+    const history={
+      email:logMail,dateTime,type,amount:amt,Description:des
+    }
+
+    await fetch("/history",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(history)
+    })
+
+    const transaction={
+      logMail,transaction:{income,expense,balance}
+    }
+
+    await fetch("/updateTransaction",({
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(transaction)
+  })) 
+
+ }
+
+ function displayHistory(){
+  window.location.href = "/history.html";
+ }
+</script>
+</html>
